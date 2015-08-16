@@ -29,7 +29,6 @@ import ca.uol.aig.fftpack.RealDoubleFFT;
 
 public class SoundRecordAndAnalysisActivity extends Activity implements OnClickListener{
 
-    //private static final double[] CANCELLED = {100};
 	int frequency = 8000;
     int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
     int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
@@ -40,7 +39,7 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
     Button startStopButton;
     boolean started = false;
     boolean CANCELLED_FLAG = false;
-    double[][] cancelledResult = {{100}};
+    
 
     RecordAudio recordTask;
     ImageView imageViewDisplaySectrum;
@@ -227,11 +226,14 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
         
         public void onStop(){
         	super.onStop();
-        	/*started = false;
-            startStopButton.setText("Start");*/
-            //if(recordTask != null){
-            recordTask.cancel(true);
-            //}
+        	/* try{
+                 audioRecord.stop();
+             }
+             catch(IllegalStateException e){
+                 Log.e("Stop failed", e.toString());
+
+             }*/
+        	recordTask.cancel(true);
             Intent intent = new Intent(Intent.ACTION_MAIN);
         	intent.addCategory(Intent.CATEGORY_HOME);
         	intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -321,9 +323,15 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
         @Override
         public void onBackPressed() {
         	super.onBackPressed();
-        	//if(recordTask != null){
-        		recordTask.cancel(true); 
-        	//}
+        	
+        	 try{
+                 audioRecord.stop();
+             }
+             catch(IllegalStateException e){
+                 Log.e("Stop failed", e.toString());
+
+             }
+        	 recordTask.cancel(true);
         	Intent intent = new Intent(Intent.ACTION_MAIN);
         	intent.addCategory(Intent.CATEGORY_HOME);
         	intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -334,7 +342,14 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
         protected void onDestroy() {
             // TODO Auto-generated method stub
             super.onDestroy();
-            recordTask.cancel(true); 
+            try{
+                audioRecord.stop();
+            }
+            catch(IllegalStateException e){
+                Log.e("Stop failed", e.toString());
+
+            }
+            recordTask.cancel(true);
             Intent intent = new Intent(Intent.ACTION_MAIN);
         	intent.addCategory(Intent.CATEGORY_HOME);
         	intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
