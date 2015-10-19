@@ -1,0 +1,8 @@
+obj/
+bin
+gen
+
+.settings
+**/.DS_Store
+.gradle
+local.properties
