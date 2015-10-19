@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/FFT-demo/FFT-demo.iml" filepath="$PROJECT_DIR$/FFT-demo/FFT-demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FFT-lib/FFT-lib.iml" filepath="$PROJECT_DIR$/FFT-lib/FFT-lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/FFTBasedSpectrumAnalyzer.iml" filepath="$PROJECT_DIR$/FFTBasedSpectrumAnalyzer.iml" />
+    </modules>
+  </component>
+</project>
