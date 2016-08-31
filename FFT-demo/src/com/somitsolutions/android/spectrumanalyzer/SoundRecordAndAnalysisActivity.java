@@ -80,8 +80,9 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 	protected void onCancelled(Boolean result) {
 
 		try {
-			if (audioRecord!=null)
-			audioRecord.stop();
+			if (audioRecord != null) {
+				audioRecord.stop();
+			}
 		} catch (IllegalStateException e) {
 			Log.e("Stop failed", e.toString());
 
@@ -98,8 +99,9 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 			CANCELLED_FLAG = true;
 			// recordTask.cancel(true);
 			try {
-				if (audioRecord!=null)
-				audioRecord.stop();
+				if (audioRecord != null) {
+					audioRecord.stop();
+				}
 			} catch (IllegalStateException e) {
 				Log.e("Stop failed", e.toString());
 
@@ -223,8 +225,9 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 		super.onBackPressed();
 
 		try {
-			if (audioRecord!=null)
-			audioRecord.stop();
+			if (audioRecord != null) {
+				audioRecord.stop();
+			}
 		} catch (IllegalStateException e) {
 			Log.e("Stop failed", e.toString());
 
@@ -243,14 +246,16 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		try {
-			if (audioRecord!=null)
-			audioRecord.stop();
+			if (audioRecord != null) {
+				audioRecord.stop();
+			}
 		} catch (IllegalStateException e) {
 			Log.e("Stop failed", e.toString());
 
 		}
-		if (recordTask!=null)
-		recordTask.cancel(true);
+		if (recordTask != null) {
+			recordTask.cancel(true);
+		}
 		Intent intent = new Intent(Intent.ACTION_MAIN);
 		intent.addCategory(Intent.CATEGORY_HOME);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -327,8 +332,9 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
 			try {
-				if (audioRecord!=null)
-				audioRecord.stop();
+				if (audioRecord != null) {
+					audioRecord.stop();
+				}
 			} catch (IllegalStateException e) {
 				Log.e("Stop failed", e.toString());
 			}
