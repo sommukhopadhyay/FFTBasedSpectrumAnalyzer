@@ -24,28 +24,26 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
 import ca.uol.aig.fftpack.RealDoubleFFT;
 
 public class SoundRecordAndAnalysisActivity extends Activity implements OnClickListener {
 
+	private final static int ID_BITMAPDISPLAYSPECTRUM = 1;
+	private final static int ID_IMAGEVIEWSCALE = 2;
 	int frequency = 8000;
 	int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
 	int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-
 	AudioRecord audioRecord;
-	private RealDoubleFFT transformer;
 	int blockSize;// = 256;
 	Button startStopButton;
 	boolean started = false;
 	boolean CANCELLED_FLAG = false;
-
 	RecordAudio recordTask;
 	ImageView imageViewDisplaySectrum;
 	MyImageView imageViewScale;
 	Bitmap bitmapDisplaySpectrum;
-
 	Canvas canvasDisplaySpectrum;
-
 	Paint paintSpectrumDisplay;
 	Paint paintScaleDisplay;
 	LinearLayout main;
@@ -53,10 +51,11 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 	int height;
 	int left_Of_BimapScale;
 	int left_Of_DisplaySpectrum;
-	private final static int ID_BITMAPDISPLAYSPECTRUM = 1;
-	private final static int ID_IMAGEVIEWSCALE = 2;
+	private RealDoubleFFT transformer;
 
-	/** Called when the activity is first created. */
+	/**
+	 * Called when the activity is first created.
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -76,87 +75,6 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 		ImageView bitmap = (ImageView) main.findViewById(ID_BITMAPDISPLAYSPECTRUM);
 		left_Of_BimapScale = scale.getLeft();
 		left_Of_DisplaySpectrum = bitmap.getLeft();
-	}
-
-	private class RecordAudio extends AsyncTask<Void, double[], Boolean> {
-
-		@Override
-		protected Boolean doInBackground(Void... params) {
-
-			int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
-			audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, frequency, channelConfiguration, audioEncoding, bufferSize);
-			int bufferReadResult;
-			short[] buffer = new short[blockSize];
-			double[] toTransform = new double[blockSize];
-			try {
-				audioRecord.startRecording();
-			} catch (IllegalStateException e) {
-				Log.e("Recording failed", e.toString());
-
-			}
-			while (started) {
-
-				if (isCancelled() || (CANCELLED_FLAG == true)) {
-
-					started = false;
-					// publishProgress(cancelledResult);
-					Log.d("doInBackground", "Cancelling the RecordTask");
-					break;
-				} else {
-					bufferReadResult = audioRecord.read(buffer, 0, blockSize);
-
-					for (int i = 0; i < blockSize && i < bufferReadResult; i++) {
-						toTransform[i] = buffer[i] / 32768.0; // signed 16 bit
-					}
-
-					transformer.ft(toTransform);
-
-					publishProgress(toTransform);
-
-				}
-
-			}
-			return true;
-		}
-
-		@Override
-		protected void onProgressUpdate(double[]... progress) {
-			Log.d("onProgressUpdate:", Integer.toString(progress[0].length));
-			canvasDisplaySpectrum.drawColor(Color.GRAY);
-			if (width > 512) {
-				for (int i = 0; i < progress[0].length; i++) {
-					int x = 2 * i;
-					int downy = (int) (150 - (progress[0][i] * 10));
-					int upy = 150;
-					canvasDisplaySpectrum.drawLine(x, downy, x, upy, paintSpectrumDisplay);
-				}
-
-				imageViewDisplaySectrum.invalidate();
-			} else {
-				for (int i = 0; i < progress[0].length; i++) {
-					int x = i;
-					int downy = (int) (150 - (progress[0][i] * 10));
-					int upy = 150;
-					canvasDisplaySpectrum.drawLine(x, downy, x, upy, paintSpectrumDisplay);
-				}
-
-				imageViewDisplaySectrum.invalidate();
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Boolean result) {
-			super.onPostExecute(result);
-			try {
-				audioRecord.stop();
-			} catch (IllegalStateException e) {
-				Log.e("Stop failed", e.toString());
-			}
-
-			canvasDisplaySpectrum.drawColor(Color.BLACK);
-			imageViewDisplaySectrum.invalidate();
-
-		}
 	}
 
 	protected void onCancelled(Boolean result) {
@@ -330,6 +248,87 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 		startActivity(intent);
 	}
 
+	private class RecordAudio extends AsyncTask<Void, double[], Boolean> {
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+
+			int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
+			audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, frequency, channelConfiguration, audioEncoding, bufferSize);
+			int bufferReadResult;
+			short[] buffer = new short[blockSize];
+			double[] toTransform = new double[blockSize];
+			try {
+				audioRecord.startRecording();
+			} catch (IllegalStateException e) {
+				Log.e("Recording failed", e.toString());
+
+			}
+			while (started) {
+
+				if (isCancelled() || (CANCELLED_FLAG == true)) {
+
+					started = false;
+					// publishProgress(cancelledResult);
+					Log.d("doInBackground", "Cancelling the RecordTask");
+					break;
+				} else {
+					bufferReadResult = audioRecord.read(buffer, 0, blockSize);
+
+					for (int i = 0; i < blockSize && i < bufferReadResult; i++) {
+						toTransform[i] = buffer[i] / 32768.0; // signed 16 bit
+					}
+
+					transformer.ft(toTransform);
+
+					publishProgress(toTransform);
+
+				}
+
+			}
+			return true;
+		}
+
+		@Override
+		protected void onProgressUpdate(double[]... progress) {
+			Log.d("onProgressUpdate:", Integer.toString(progress[0].length));
+			canvasDisplaySpectrum.drawColor(Color.GRAY);
+			if (width > 512) {
+				for (int i = 0; i < progress[0].length; i++) {
+					int x = 2 * i;
+					int downy = (int) (150 - (progress[0][i] * 10));
+					int upy = 150;
+					canvasDisplaySpectrum.drawLine(x, downy, x, upy, paintSpectrumDisplay);
+				}
+
+				imageViewDisplaySectrum.invalidate();
+			} else {
+				for (int i = 0; i < progress[0].length; i++) {
+					int x = i;
+					int downy = (int) (150 - (progress[0][i] * 10));
+					int upy = 150;
+					canvasDisplaySpectrum.drawLine(x, downy, x, upy, paintSpectrumDisplay);
+				}
+
+				imageViewDisplaySectrum.invalidate();
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			super.onPostExecute(result);
+			try {
+				audioRecord.stop();
+			} catch (IllegalStateException e) {
+				Log.e("Stop failed", e.toString());
+			}
+
+			canvasDisplaySpectrum.drawColor(Color.BLACK);
+			imageViewDisplaySectrum.invalidate();
+
+		}
+	}
+
 	// Custom Imageview Class
 	public class MyImageView extends ImageView {
 		Paint paintScaleDisplay;
@@ -381,9 +380,7 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 					canvasScale.drawText(text, i, 45, paintScaleDisplay);
 				}
 				canvas.drawBitmap(bitmapScale, 0, 0, paintScaleDisplay);
-			}
-
-			else if (width < 320) {
+			} else if (width < 320) {
 				canvasScale.drawLine(0, 30, 256, 30, paintScaleDisplay);
 				for (int i = 0, j = 0; i < 256; i = i + 64, j++) {
 					for (int k = i; k < (i + 64); k = k + 8) {
