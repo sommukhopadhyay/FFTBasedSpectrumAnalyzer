@@ -7,10 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -23,22 +19,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
-import ca.uol.aig.fftpack.RealDoubleFFT;
+import ca.uol.aig.fftpack.RecordTask;
 import ca.uol.aig.fftpack.view.ScaleImageView;
 
 public class SoundRecordAndAnalysisActivity extends Activity implements OnClickListener {
 
-	//	private final static int ID_BITMAPDISPLAYSPECTRUM = 1;
-//	private final static int ID_IMAGEVIEWSCALE = 2;
-	int frequency = 8000;
-	int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-	int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-	AudioRecord audioRecord;
-	int blockSize = 256;
 	Button startStopButton;
-	boolean started = false;
-	boolean CANCELLED_FLAG = false;
-	RecordAudio recordTask;
+	RecordTask recordTask;
 	ImageView imageViewDisplaySectrum;
 	ScaleImageView imageViewScale;
 	Bitmap bitmapDisplaySpectrum;
@@ -49,87 +36,30 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 	int width;
 	int height;
 
-	/**
-	 * Called when the activity is first created.
-	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Display display = getWindowManager().getDefaultDisplay();
-		// Point size = new Point();
-		// display.get(size);
 		width = display.getWidth();
 		height = display.getHeight();
-
-		blockSize = 256;
-	}
-
-//	@Override
-//	public void onWindowFocusChanged(boolean hasFocus) {
-//		MyImageView scale = (MyImageView) main.findViewById(ID_IMAGEVIEWSCALE);
-//		ImageView bitmap = (ImageView) main.findViewById(ID_BITMAPDISPLAYSPECTRUM);
-//	}
-
-	protected void onCancelled(Boolean result) {
-
-		try {
-			if (audioRecord != null) {
-				audioRecord.stop();
-			}
-		} catch (IllegalStateException e) {
-			Log.e("Stop failed", e.toString());
-		}
-		/*
-		 * //recordTask.cancel(true); Log.d("FFTSpectrumAnalyzer","onCancelled: New Screen"); Intent intent = new Intent(Intent.ACTION_MAIN);
-		 * intent.addCategory(Intent.CATEGORY_HOME); intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); startActivity(intent);
-		 */
 	}
 
 	public void onClick(View v) {
-		if (started == true) {
-			// started = false;
-			CANCELLED_FLAG = true;
-			// recordTask.cancel(true);
-			try {
-				if (audioRecord != null) {
-					audioRecord.stop();
-				}
-			} catch (IllegalStateException e) {
-				Log.e("Stop failed", e.toString());
-
-			}
+		if (recordTask.isStarted()) {
 			startStopButton.setText("Start");
-
+			recordTask.setCancel();
 			canvasDisplaySpectrum.drawColor(Color.BLACK);
 		} else {
-			started = true;
-			CANCELLED_FLAG = false;
 			startStopButton.setText("Stop");
-			recordTask = new RecordAudio();
+			recordTask = new RecordTask(canvasDisplaySpectrum, paintSpectrumDisplay, imageViewDisplaySectrum, width);
 			recordTask.execute();
 		}
 	}
 
 	@Override
-	public void onStop() {
-		super.onStop();
-		/*
-		 * try{ audioRecord.stop(); } catch(IllegalStateException e){ Log.e("Stop failed", e.toString());
-		 *
-		 * }
-		 */
-		if (recordTask != null) {
-			recordTask.cancel(true);
-		}
-		Intent intent = new Intent(Intent.ACTION_MAIN);
-		intent.addCategory(Intent.CATEGORY_HOME);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(intent);
-	}
-
-	@Override
 	public void onStart() {
 		super.onStart();
+
 		main = new LinearLayout(this);
 		main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.MATCH_PARENT));
 		main.setOrientation(LinearLayout.VERTICAL);
@@ -185,20 +115,32 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 		main.addView(startStopButton);
 
 		setContentView(main);
+
+		recordTask = new RecordTask(canvasDisplaySpectrum, paintSpectrumDisplay, imageViewDisplaySectrum, width);
 	}
 
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
-
 		try {
-			if (audioRecord != null) {
-				audioRecord.stop();
+			if (recordTask.isStarted()) {
+				recordTask.setCancel();
+			} else {
+				super.onBackPressed();
 			}
 		} catch (IllegalStateException e) {
 			Log.e("Stop failed", e.toString());
 
 		}
+		Intent intent = new Intent(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_HOME);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
+	}
+
+
+	@Override
+	public void onStop() {
+		super.onStop();
 		if (recordTask != null) {
 			recordTask.cancel(true);
 		}
@@ -210,16 +152,7 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
 		super.onDestroy();
-		try {
-			if (audioRecord != null) {
-				audioRecord.stop();
-			}
-		} catch (IllegalStateException e) {
-			Log.e("Stop failed", e.toString());
-
-		}
 		if (recordTask != null) {
 			recordTask.cancel(true);
 		}
@@ -227,89 +160,6 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 		intent.addCategory(Intent.CATEGORY_HOME);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(intent);
-	}
-
-	private class RecordAudio extends AsyncTask<Void, double[], Boolean> {
-
-		private RealDoubleFFT transformer;
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			transformer = new RealDoubleFFT(blockSize);
-		}
-
-		@Override
-		protected Boolean doInBackground(Void... params) {
-
-			int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration, audioEncoding);
-			audioRecord = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, frequency, channelConfiguration, audioEncoding, bufferSize);
-			int bufferReadResult;
-			short[] buffer = new short[blockSize];
-			double[] toTransform = new double[blockSize];
-			try {
-				audioRecord.startRecording();
-			} catch (IllegalStateException e) {
-				Log.e("Recording failed", e.toString());
-			}
-			while (started) {
-				if (isCancelled() || (CANCELLED_FLAG == true)) {
-					started = false;
-					// publishProgress(cancelledResult);
-					Log.d("doInBackground", "Cancelling the RecordTask");
-					break;
-				} else {
-					bufferReadResult = audioRecord.read(buffer, 0, blockSize);
-
-					for (int i = 0; i < blockSize && i < bufferReadResult; i++) {
-						toTransform[i] = buffer[i] / 32768.0; // signed 16 bit
-					}
-
-					transformer.ft(toTransform);
-					publishProgress(toTransform);
-				}
-			}
-			return true;
-		}
-
-		@Override
-		protected void onProgressUpdate(double[]... progress) {
-			Log.v("onProgressUpdate:", Integer.toString(progress[0].length));
-			canvasDisplaySpectrum.drawColor(Color.GRAY);
-			if (width > 512) {
-				for (int i = 0; i < progress[0].length; i++) {
-					int x = 2 * i;
-					int downy = (int) (150 - (progress[0][i] * 10));
-					int upy = 150;
-					canvasDisplaySpectrum.drawLine(x, downy, x, upy, paintSpectrumDisplay);
-				}
-				imageViewDisplaySectrum.invalidate();
-			} else {
-				for (int i = 0; i < progress[0].length; i++) {
-					int x = i;
-					int downy = (int) (150 - (progress[0][i] * 10));
-					int upy = 150;
-					canvasDisplaySpectrum.drawLine(x, downy, x, upy, paintSpectrumDisplay);
-				}
-
-				imageViewDisplaySectrum.invalidate();
-			}
-		}
-
-		@Override
-		protected void onPostExecute(Boolean result) {
-			super.onPostExecute(result);
-			try {
-				if (audioRecord != null) {
-					audioRecord.stop();
-				}
-			} catch (IllegalStateException e) {
-				Log.e("Stop failed", e.toString());
-			}
-
-			canvasDisplaySpectrum.drawColor(Color.BLACK);
-			imageViewDisplaySectrum.invalidate();
-		}
 	}
 
 }
