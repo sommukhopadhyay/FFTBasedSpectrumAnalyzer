@@ -27,6 +27,7 @@ public class RecordTask extends AsyncTask<Void, double[], Boolean> {
 
 	public RecordTask(Canvas canvasDisplaySpectrum, Paint paintSpectrumDisplay, ImageView imageViewDisplaySectrum, int width) {
 		this.width = width;
+		blockSize = width / 2;
 		this.imageViewDisplaySectrum = imageViewDisplaySectrum;
 		this.canvasDisplaySpectrum = canvasDisplaySpectrum;
 		this.paintSpectrumDisplay = paintSpectrumDisplay;
@@ -75,7 +76,7 @@ public class RecordTask extends AsyncTask<Void, double[], Boolean> {
 
 	@Override
 	protected void onProgressUpdate(double[]... progress) {
-		Log.v("onProgressUpdate:", Integer.toString(progress[0].length));
+//		Log.v("onProgressUpdate:", Integer.toString(progress[0].length));
 		canvasDisplaySpectrum.drawColor(Color.GRAY);
 		if (width > 512) {
 			for (int i = 0; i < progress[0].length; i++) {

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -19,21 +20,27 @@ public class ScaleImageView extends ImageView {
 		super(context);
 	}
 
+	public ScaleImageView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
+
+	public ScaleImageView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+	}
+
 	private void init() {
-		if (viewWidth > 512) {
-			bitmapScale = Bitmap.createBitmap(512, 50, Bitmap.Config.ARGB_8888);
-		} else {
-			bitmapScale = Bitmap.createBitmap(256, 50, Bitmap.Config.ARGB_8888);
+		if (!isInEditMode()) {
+			bitmapScale = Bitmap.createBitmap(viewWidth, 50, Bitmap.Config.ARGB_8888);
+
+			paintScaleDisplay = new Paint();
+			paintScaleDisplay.setColor(Color.WHITE);
+			paintScaleDisplay.setStyle(Paint.Style.FILL);
+
+			canvasScale = new Canvas(bitmapScale);
+
+			setImageBitmap(bitmapScale);
+			invalidate();
 		}
-
-		paintScaleDisplay = new Paint();
-		paintScaleDisplay.setColor(Color.WHITE);
-		paintScaleDisplay.setStyle(Paint.Style.FILL);
-
-		canvasScale = new Canvas(bitmapScale);
-
-		setImageBitmap(bitmapScale);
-		invalidate();
 	}
 
 	@Override
@@ -44,40 +51,18 @@ public class ScaleImageView extends ImageView {
 			return;
 		}
 
-		if (viewWidth > 512) {
-			canvasScale.drawLine(0, 30, 512, 30, paintScaleDisplay);
-			for (int i = 0, j = 0; i < 512; i = i + 128, j++) {
-				for (int k = i; k < (i + 128); k = k + 16) {
-					canvasScale.drawLine(k, 30, k, 25, paintScaleDisplay);
-				}
-				canvasScale.drawLine(i, 40, i, 25, paintScaleDisplay);
-				String text = Integer.toString(j) + " KHz";
-				canvasScale.drawText(text, i, 45, paintScaleDisplay);
+		int linesBig = viewWidth / 4;
+		int linesSmall = viewWidth / 16;
+		canvasScale.drawLine(0, 25, viewWidth, 25, paintScaleDisplay);
+		for (int i = 0, j = 0; i < viewWidth; i = i + linesBig, j++) {
+			for (int k = i; k < (i + linesBig); k = k + linesSmall) {
+				canvasScale.drawLine(k, 30, k, 25, paintScaleDisplay);
 			}
-			canvas.drawBitmap(bitmapScale, 0, 0, paintScaleDisplay);
-		} else if ((viewWidth > 320) && (viewWidth < 512)) {
-			canvasScale.drawLine(0, 30, 0 + 256, 30, paintScaleDisplay);
-			for (int i = 0, j = 0; i < 256; i = i + 64, j++) {
-				for (int k = i; k < (i + 64); k = k + 8) {
-					canvasScale.drawLine(k, 30, k, 25, paintScaleDisplay);
-				}
-				canvasScale.drawLine(i, 40, i, 25, paintScaleDisplay);
-				String text = Integer.toString(j) + " KHz";
-				canvasScale.drawText(text, i, 45, paintScaleDisplay);
-			}
-			canvas.drawBitmap(bitmapScale, 0, 0, paintScaleDisplay);
-		} else if (viewWidth < 320) {
-			canvasScale.drawLine(0, 30, 256, 30, paintScaleDisplay);
-			for (int i = 0, j = 0; i < 256; i = i + 64, j++) {
-				for (int k = i; k < (i + 64); k = k + 8) {
-					canvasScale.drawLine(k, 30, k, 25, paintScaleDisplay);
-				}
-				canvasScale.drawLine(i, 40, i, 25, paintScaleDisplay);
-				String text = Integer.toString(j) + " KHz";
-				canvasScale.drawText(text, i, 45, paintScaleDisplay);
-			}
-			canvas.drawBitmap(bitmapScale, 0, 0, paintScaleDisplay);
+			canvasScale.drawLine(i, 40, i, 25, paintScaleDisplay);
+			String text = Integer.toString(j) + " KHz";
+			canvasScale.drawText(text, i, 45, paintScaleDisplay);
 		}
+		canvas.drawBitmap(bitmapScale, 0, 0, paintScaleDisplay);
 	}
 
 	@Override
