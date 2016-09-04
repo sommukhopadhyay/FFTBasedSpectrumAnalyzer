@@ -37,7 +37,6 @@ public class ScaleImageView extends ImageView {
 			paintScaleDisplay.setStyle(Paint.Style.FILL);
 
 			canvasScale = new Canvas(bitmapScale);
-
 			setImageBitmap(bitmapScale);
 			invalidate();
 		}
@@ -62,7 +61,7 @@ public class ScaleImageView extends ImageView {
 			String text = Integer.toString(j) + " KHz";
 			canvasScale.drawText(text, i, 45, paintScaleDisplay);
 		}
-		canvas.drawBitmap(bitmapScale, 0, 0, paintScaleDisplay);
+//		canvas.drawBitmap(bitmapScale, 0, 0, paintScaleDisplay);
 	}
 
 	@Override
@@ -71,6 +70,6 @@ public class ScaleImageView extends ImageView {
 		viewWidth = xNew;
 		viewHeight = yNew;
 		init();
-		Log.d("dimension", viewWidth + " x " + viewHeight);
+		Log.d("DimensionScale", viewWidth + " x " + viewHeight);
 	}
 }
