@@ -3,5 +3,6 @@
 
     <string name="hello">Hello World, SoundRecordAndAnalysisActivity!</string>
     <string name="app_name">SpectrumAnalyzer</string>
+    <string name="accelerator">Räumliche Bewegung</string>
 
 </resources>
