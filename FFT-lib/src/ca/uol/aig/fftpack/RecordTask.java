@@ -16,14 +16,14 @@ public class RecordTask extends AsyncTask<Void, double[], Boolean> {
 	private final ImageView imageViewDisplaySectrum;
 	private final Canvas canvasDisplaySpectrum;
 	private final Paint paintSpectrumDisplay;
+	int frequency = 8000;
+	int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
+	int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 	private RealDoubleFFT transformer;
 	private int blockSize = 256;
 	private boolean started = false;
 	private boolean CANCELLED_FLAG = false;
 	private AudioRecord audioRecord;
-	int frequency = 8000;
-	int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-	int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 
 	public RecordTask(Canvas canvasDisplaySpectrum, Paint paintSpectrumDisplay, ImageView imageViewDisplaySectrum, int width) {
 		this.width = width;
