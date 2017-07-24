@@ -10,7 +10,7 @@ buildscript {
 }
 
 dependencies {
-    compile 'com.android.support:support-v13:23.1.0'
+    compile "com.android.support:support-v13:${defaultSupportLibVersion}"
 }
 
 android {
