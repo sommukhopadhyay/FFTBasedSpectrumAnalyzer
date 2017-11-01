@@ -1,0 +1,15 @@
+obj/
+bin
+gen
+
+.settings
+.metadata
+**/.DS_Store
+.gradle
+local.properties
+
+*.iml
+build/
+.idea/*
+!codeStyleSettings.xml
+.idea/
