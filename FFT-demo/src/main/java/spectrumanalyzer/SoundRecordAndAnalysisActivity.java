@@ -1,4 +1,4 @@
-package com.somitsolutions.android.spectrumanalyzer;
+package spectrumanalyzer;
 
 import android.app.Activity;
 import android.content.Intent;

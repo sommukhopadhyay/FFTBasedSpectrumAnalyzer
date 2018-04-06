@@ -6,12 +6,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.android.tools.build:gradle:3.1.0'
     }
 }
 
 dependencies {
-    compile "com.android.support:support-v13:${defaultSupportLibVersion}"
+    implementation "com.android.support:support-v13:${defaultSupportLibVersion}"
 }
 
 android {
@@ -25,17 +25,5 @@ android {
 
     lintOptions { abortOnError false }
 
-    sourceSets {
-        main {
-            manifest.srcFile 'AndroidManifest.xml'
-            java.srcDirs = ['src', 'src-gen']
-            resources.srcDirs = ['src']
-            aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
-            res.srcDirs = ['res']
-            assets.srcDirs = ['assets']
-        }
-        instrumentTest.setRoot('tests')
-    }
 }
 
