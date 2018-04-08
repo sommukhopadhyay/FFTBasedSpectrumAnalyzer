@@ -26,7 +26,7 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 
 	Button startStopButton;
 	RecordTask recordTask;
-	ImageView imageViewDisplaySectrum;
+	ImageView imageViewDisplaySpectrum;
 	ScaleImageView imageViewScale;
 	Bitmap bitmapDisplaySpectrum;
 	Canvas canvasDisplaySpectrum;
@@ -50,7 +50,7 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 			canvasDisplaySpectrum.drawColor(Color.BLACK);
 		} else {
 			startStopButton.setText("Stop");
-			recordTask = new RecordTask(canvasDisplaySpectrum, paintSpectrumDisplay, imageViewDisplaySectrum, width);
+			recordTask = new RecordTask(canvasDisplaySpectrum, paintSpectrumDisplay, imageViewDisplaySpectrum, width);
 			recordTask.execute();
 		}
 	}
@@ -66,18 +66,18 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-		imageViewDisplaySectrum = new ImageView(this);
+		imageViewDisplaySpectrum = new ImageView(this);
 		bitmapDisplaySpectrum = Bitmap.createBitmap(width, 300, Bitmap.Config.ARGB_8888);
 		LinearLayout.LayoutParams layoutParams_imageViewScale;
 		canvasDisplaySpectrum = new Canvas(bitmapDisplaySpectrum);
 		paintSpectrumDisplay = new Paint();
 		paintSpectrumDisplay.setColor(Color.GREEN);
-		imageViewDisplaySectrum.setImageBitmap(bitmapDisplaySpectrum);
-		imageViewDisplaySectrum.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+		imageViewDisplaySpectrum.setImageBitmap(bitmapDisplaySpectrum);
+		imageViewDisplaySpectrum.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		layoutParams_imageViewScale = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 
-		imageViewDisplaySectrum.setId(View.NO_ID);
-		main.addView(imageViewDisplaySectrum);
+		imageViewDisplaySpectrum.setId(View.NO_ID);
+		main.addView(imageViewDisplaySpectrum);
 
 		//Scale
 		imageViewScale = new ScaleImageView(this);
@@ -95,7 +95,7 @@ public class SoundRecordAndAnalysisActivity extends Activity implements OnClickL
 
 		setContentView(main);
 
-		recordTask = new RecordTask(canvasDisplaySpectrum, paintSpectrumDisplay, imageViewDisplaySectrum, width);
+		recordTask = new RecordTask(canvasDisplaySpectrum, paintSpectrumDisplay, imageViewDisplaySpectrum, width);
 	}
 
 	@Override
