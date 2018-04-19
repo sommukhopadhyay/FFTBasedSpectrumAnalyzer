@@ -1008,7 +1008,7 @@ class RealDoubleFFT_Mixed {
 			return;
 		}
 		rfftf1(n, r, wtable, 0);
-	} 	/*rfftf*/
+	}    /*rfftf*/
 
 	/*---------------------------------------------------------
    rfftf: Real backward FFT

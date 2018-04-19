@@ -12,7 +12,7 @@ class ComplexDoubleFFT_Mixed {
   ----------------------------------------------------------------------*/
 
 	void passf2(int ido, int l1, final double cc[], double ch[], final double wtable[], int offset, int isign)
-				  /*isign==+1 for backward transform*/ {
+		/*isign==+1 for backward transform*/ {
 		int i, k, ah, ac;
 		double ti2, tr2;
 		int iw1;
@@ -172,7 +172,7 @@ class ComplexDoubleFFT_Mixed {
    isign is +1 for backward and -1 for forward transforms
   ----------------------------------------------------------------------*/
 	void passf5(int ido, int l1, final double cc[], double ch[], final double wtable[], int offset, int isign)
-			   /*isign==-1 for forward transform and+1 for backward transform*/ {
+	/*isign==-1 for forward transform and+1 for backward transform*/ {
 		final double tr11 = 0.309016994374947;
 		final double ti11 = 0.951056516295154;
 		final double tr12 = -0.809016994374947;
@@ -583,6 +583,6 @@ class ComplexDoubleFFT_Mixed {
 			return;
 		}
 		cffti1(n, wtable);
-	}	/*cffti*/
+	}    /*cffti*/
 
 }
